@@ -15,9 +15,34 @@ enum Unit {
     case yards
 }
 
-struct Convertor {
+enum UnitError: Error {
+    case unsupportedUnit
+}
+
+struct Converter {
     
-    static func convert(_ startingValue: Double, startingUnit: Unit, to convertedValue: Double, convertedUnit: Unit) -> Double {
+    static func unitFor(string: String) throws -> Unit {
+        
+        let cleanString = string.lowercased().trimmingCharacters(in: .whitespaces)
+        
+        switch cleanString {
+        case "meters":
+            return .meters
+        case "kilometers":
+            return .kilometers
+        case "miles":
+            return .miles
+        case "feet":
+            return .feet
+        case "yards":
+            return .yards
+        default:
+            throw UnitError.unsupportedUnit
+        }
+        
+    }
+    
+    static func convert(_ startingValue: Double, startingUnit: Unit, to convertedUnit: Unit) -> Double {
         
         let valueInMeters: Double
         
@@ -38,36 +63,37 @@ struct Convertor {
     }
     
     private static func toMeters(_ number: Double, unit: Unit) -> Double{
+        
         switch unit {
         case .meters:
             return number
         case .kilometers:
-            fallthrough
+            return number * 1000
         case .miles:
-            fallthrough
+            return number * 1_609.344
         case .feet:
-            fallthrough
+            return number / 3.28084
         case .yards:
-            break
+            return number / 1.0936
         }
         
-        return 0.0
     }
     
     private static func metersTo(_ number: Double, unit: Unit) -> Double{
+        
         switch unit {
         case .meters:
             return number
         case .kilometers:
-            fallthrough
+            return number / 1000
         case .miles:
-            fallthrough
+            return number / 1_609.344
         case .feet:
-            fallthrough
+            return number * 3.28084
         case .yards:
-            break
+            return number * 1.0936
         }
-        
-        return 0.0
+
     }
+    
 }
